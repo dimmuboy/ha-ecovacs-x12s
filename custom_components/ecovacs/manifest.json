@@ -24,6 +24,6 @@
     "py-sucks==0.9.11",
     "deebot-client==18.7.0"
   ],
-  "version": "0.1.1",
+  "version": "0.1.2",
   "issue_tracker": "https://github.com/dimmuboy/ha-ecovacs-x12s/issues"
 }
