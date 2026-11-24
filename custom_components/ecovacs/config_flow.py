@@ -21,7 +21,7 @@ from deebot_client.mqtt_client import MqttClient, create_mqtt_config
 from deebot_client.util import md5
 import probatio
 
-from homeassistant.config_entries import SOURCE_REAUTH, ConfigFlow, ConfigFlowResult
+from homeassistant.config_entries import SOURCE_REAUTH, ConfigEntry, ConfigFlow, ConfigFlowResult, OptionsFlowWithReload
 from homeassistant.const import (
     CONF_COUNTRY,
     CONF_DEVICE_ID,
@@ -44,6 +44,7 @@ from .const import (
     InstanceMode,
 )
 from .util import get_client_device_id
+from .map_style import COLORS, FLAGS, valid_color
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -147,6 +148,11 @@ async def _validate_mqtt(
 
 class EcovacsConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle a config flow for Ecovacs."""
+
+    @staticmethod
+    @callback
+    def async_get_options_flow(config_entry: ConfigEntry):
+        return EcovacsMapOptionsFlow()
 
     VERSION = 1
     MINOR_VERSION = 2
@@ -432,3 +438,30 @@ class EcovacsConfigFlow(ConfigFlow, domain=DOMAIN):
                 return self._finish_flow()
 
         return self._show_reauth_form(user_input, errors)
+
+
+class EcovacsMapOptionsFlow(OptionsFlowWithReload):
+    """Configure the native map appearance."""
+
+    async def async_step_init(self, user_input=None):
+        errors = {}
+        if user_input is not None:
+            errors = {
+                key: "invalid_color" for key in COLORS
+                if not valid_color(key, user_input.get(key, ""))
+            }
+            if not errors:
+                return self.async_create_entry(
+                    title="", data=dict(self.config_entry.options) | user_input
+                )
+        values = COLORS | FLAGS | dict(self.config_entry.options) | (user_input or {})
+        schema = {
+            probatio.Optional(key, default=values[key]): selector.TextSelector()
+            for key in COLORS
+        }
+        schema.update({
+            probatio.Required(key, default=values[key]): bool for key in FLAGS
+        })
+        return self.async_show_form(
+            step_id="init", data_schema=probatio.Schema(schema), errors=errors
+        )

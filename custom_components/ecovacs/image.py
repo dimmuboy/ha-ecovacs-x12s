@@ -14,6 +14,7 @@ from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 
 from . import EcovacsConfigEntry
 from .entity import EcovacsEntity
+from .map_style import settings_key, style_svg
 
 
 async def async_setup_entry(
@@ -24,7 +25,7 @@ async def async_setup_entry(
     """Add entities for passed config_entry in HA."""
     controller = config_entry.runtime_data
     entities = [
-        EcovacsMap(device, caps, hass)
+        EcovacsMap(device, caps, hass, config_entry)
         for device in controller.devices
         if (caps := device.capabilities.map)
     ]
@@ -46,11 +47,13 @@ class EcovacsMap(
         device: Device,
         capability: CapabilityMap,
         hass: HomeAssistant,
+        config_entry: EcovacsConfigEntry,
     ) -> None:
         """Initialize entity."""
         super().__init__(device, capability, hass=hass)
         self._attr_extra_state_attributes = {}
         self._map = cast(Map, self._device.map)
+        self._map_style = settings_key(config_entry.options)
 
     entity_description = EntityDescription(
         key="map",
@@ -61,7 +64,7 @@ class EcovacsMap(
     def image(self) -> bytes | None:
         """Return bytes of image or None."""
         if svg := self._map.get_svg_map():
-            return svg.encode()
+            return style_svg(svg, self._map_style)
 
         return None
 

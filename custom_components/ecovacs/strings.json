@@ -439,5 +439,35 @@
       "description": "Retrieves a raw response containing the positions of the chargers and the device itself.",
       "name": "Get raw positions"
     }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "Map appearance",
+        "description": "Customize the native SVG map. Enter colors as #RRGGBB. Room palette colors repeat across rooms. Applies to all vacuums in this account.",
+        "data": {
+          "map_background": "Background (blank for transparent)",
+          "map_floor": "Unmapped floor color",
+          "map_walls": "Wall color",
+          "map_path": "Cleaning path color",
+          "map_robot": "Robot color",
+          "map_dock": "Dock color",
+          "map_colored_rooms": "Colored rooms",
+          "map_show_path": "Show cleaning path",
+          "map_show_robot": "Show robot",
+          "map_show_dock": "Show dock",
+          "map_show_zones": "Show virtual walls and no-mop zones",
+          "map_room_1": "Room palette color 1",
+          "map_room_2": "Room palette color 2",
+          "map_room_3": "Room palette color 3",
+          "map_room_4": "Room palette color 4",
+          "map_room_5": "Room palette color 5",
+          "map_room_6": "Room palette color 6"
+        }
+      }
+    },
+    "error": {
+      "invalid_color": "Enter a hexadecimal color such as #a2bce7."
+    }
   }
 }
