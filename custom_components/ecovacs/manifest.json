@@ -1,0 +1,29 @@
+{
+  "domain": "ecovacs",
+  "name": "Ecovacs",
+  "categories": [
+    "appliances_cleaning.cleaning",
+    "garden_plants"
+  ],
+  "codeowners": [
+    "@dimmuboy"
+  ],
+  "config_flow": true,
+  "connectivity": [
+    "cloud"
+  ],
+  "documentation": "https://github.com/dimmuboy/ha-ecovacs-x12s",
+  "integration_type": "hub",
+  "iot_class": "cloud_push",
+  "loggers": [
+    "sleekxmppfs",
+    "sucks",
+    "deebot_client"
+  ],
+  "requirements": [
+    "py-sucks==0.9.11",
+    "deebot-client==18.7.0"
+  ],
+  "version": "0.1.0",
+  "issue_tracker": "https://github.com/dimmuboy/ha-ecovacs-x12s/issues"
+}
