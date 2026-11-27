@@ -444,9 +444,9 @@
     "step": {
       "init": {
         "title": "Map appearance",
-        "description": "Customize the native SVG map. Enter colors as #RRGGBB. Room palette colors repeat across rooms. Applies to all vacuums in this account.",
+        "description": "Customize the native SVG map. Room palette colors repeat across rooms. Padding is measured in map units. Settings apply to all vacuums in this account.",
         "data": {
-          "map_background": "Background (blank for transparent)",
+          "map_background": "Background color",
           "map_floor": "Unmapped floor color",
           "map_walls": "Wall color",
           "map_path": "Cleaning path color",
@@ -462,12 +462,19 @@
           "map_room_3": "Room palette color 3",
           "map_room_4": "Room palette color 4",
           "map_room_5": "Room palette color 5",
-          "map_room_6": "Room palette color 6"
+          "map_room_6": "Room palette color 6",
+          "map_transparent": "Transparent background",
+          "map_room_opacity": "Room opacity (%)",
+          "map_path_opacity": "Cleaning path opacity (%)",
+          "map_wall_opacity": "Wall opacity (%)",
+          "map_padding": "Map padding",
+          "map_rotation": "Additional rotation (degrees)"
         }
       }
     },
     "error": {
-      "invalid_color": "Enter a hexadecimal color such as #a2bce7."
+      "invalid_color": "Enter a hexadecimal color such as #a2bce7.",
+      "invalid_number": "Invalid map setting."
     }
   }
 }

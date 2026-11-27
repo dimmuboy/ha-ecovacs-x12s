@@ -44,7 +44,7 @@ from .const import (
     InstanceMode,
 )
 from .util import get_client_device_id
-from .map_style import COLORS, FLAGS, valid_color
+from .map_style import COLORS, FLAGS, NUMBERS, hex_to_rgb, rgb_to_hex, valid_color, valid_number
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -445,23 +445,32 @@ class EcovacsMapOptionsFlow(OptionsFlowWithReload):
 
     async def async_step_init(self, user_input=None):
         errors = {}
+        values = COLORS | FLAGS | NUMBERS | dict(self.config_entry.options)
         if user_input is not None:
-            errors = {
-                key: "invalid_color" for key in COLORS
-                if not valid_color(key, user_input.get(key, ""))
-            }
+            values.update(user_input)
+            converted = {key: rgb_to_hex(user_input.get(key)) for key in COLORS}
+            if user_input.get("map_transparent"):
+                converted["map_background"] = ""
+            errors = {key: "invalid_color" for key, value in converted.items()
+                      if not valid_color(key, value)}
+            errors.update({key: "invalid_number" for key in NUMBERS
+                           if not valid_number(key, user_input.get(key))})
             if not errors:
-                return self.async_create_entry(
-                    title="", data=dict(self.config_entry.options) | user_input
-                )
-        values = COLORS | FLAGS | dict(self.config_entry.options) | (user_input or {})
+                return self.async_create_entry(title="", data=dict(self.config_entry.options) |
+                    user_input | converted)
         schema = {
-            probatio.Optional(key, default=values[key]): selector.TextSelector()
-            for key in COLORS
+            probatio.Required("map_transparent", default=values.get("map_transparent", not values["map_background"])): bool,
         }
+        schema.update({
+            probatio.Required(key, default=hex_to_rgb(rgb_to_hex(values[key]))): selector.ColorRGBSelector()
+            for key in COLORS
+        })
         schema.update({
             probatio.Required(key, default=values[key]): bool for key in FLAGS
         })
-        return self.async_show_form(
-            step_id="init", data_schema=probatio.Schema(schema), errors=errors
-        )
+        for key in NUMBERS:
+            schema[probatio.Required(key, default=values[key])] = selector.NumberSelector(
+                selector.NumberSelectorConfig(min=0, max=270 if key == "map_rotation" else 50 if key == "map_padding" else 100,
+                    step=90 if key == "map_rotation" else 1, mode=selector.NumberSelectorMode.SLIDER)
+            )
+        return self.async_show_form(step_id="init", data_schema=probatio.Schema(schema), errors=errors)
